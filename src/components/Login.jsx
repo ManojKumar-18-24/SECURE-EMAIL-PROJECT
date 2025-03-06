@@ -3,8 +3,9 @@ import {Link, useNavigate} from 'react-router-dom'
 import { login as authLogin } from '../store/authSlice'
 import {Button, Input, Logo} from "./index"
 import {useDispatch} from "react-redux"
-import authService from "../../appwrite/auth"
+import authService from "../backend/auth"
 import {useForm} from "react-hook-form"
+import { hashPassword } from '../cryptography/hash'
 
 function Login() {
     const navigate = useNavigate()
@@ -15,6 +16,11 @@ function Login() {
     const login = async(data) => {
         setError("")
         try {
+
+            localStorage.setItem("password" , data.password)
+            
+            data.password = hashPassword(data.password)
+
             const session = await authService.login(data)
             if (session) {
                 const userData = await authService.getCurrentUser()

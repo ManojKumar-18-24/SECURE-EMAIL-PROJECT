@@ -1,14 +1,14 @@
-import React from 'react';
-import logo from '../assets/logo.webp';
+import React from "react";
+import logo from "../assets/logo.webp";
 
-function Logo({ width = '100px' }) {
+function Logo({ width = "70px" }) {
   return (
-    <div className="flex justify-center items-center m-4">
+    <div className="flex justify-center items-center">
       <img
         src={logo}
-        alt="logo"
+        alt="Unishare Logo"
         className="rounded-full shadow-lg object-cover"
-        style={{ width, height:width }}
+        style={{ width, height: width, minWidth: "50px" }}
       />
     </div>
   );

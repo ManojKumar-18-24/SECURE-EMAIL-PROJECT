@@ -126,90 +126,6 @@ class Service {
     }
   }
 
-  //notification service
-
-  async createNotification({ owner, tenant, post_id }) {
-    console.log('in create notifi:',owner,tenant,post_id)
-    try {
-      return await this.databases.createDocument(
-        conf.appwriteDatabaseId,
-        conf.appwriteNotificationsId,
-        ID.unique(),
-        {
-          owner,
-          post_id,
-          tenant,
-        }
-      );
-    } catch (error) {
-      console.log("error in createNotification::", error);
-    }
-  }
-
-  async updateNotification({ id, owner, tenant, post_id, isRead, isAccepted }) {
-    try {
-      return await this.databases.updateDocument(
-        conf.appwriteDatabaseId,
-        conf.appwriteNotificationsId,
-        id,
-        {
-          owner,
-          post_id,
-          tenant,
-          isRead,
-          isAccepted,
-        }
-      );
-    } catch (error) {
-      console.log("error in createPost::", error);
-    }
-  }
-
-  async getNotification(id) {
-    try {
-      return await this.databases.getDocument(
-        conf.appwriteDatabaseId,
-        conf.appwriteNotificationsId,
-        id
-      );
-    } catch (error) {
-      console.log("error in get one Notification:", error);
-      throw error;
-    }
-  }
-
-  async getNotifications(userId) {
-    try {
-      return await this.databases.listDocuments(
-        conf.appwriteDatabaseId,
-        conf.appwriteNotificationsId,
-        [Query.or([Query.equal("owner", userId), Query.equal("tenant", userId)])]
-      );
-    } catch (error) {
-      console.log("error in getall Notifications:", error);
-      throw error;
-    }
-  }
-
-  async findNotification(userId,postId)
-  {   console.log("userId:", userId, "postId:", postId);
-
-    const queries = [
-      Query.equal("tenant", userId),
-      Query.equal("post_id", postId)
-  ];
-     try {
-      return await this.databases.listDocuments(
-        conf.appwriteDatabaseId,
-        conf.appwriteNotificationsId,
-        queries 
-      )
-     } catch (error) {
-      console.log("error in finding Notifications:", error);
-      throw error;      
-     }
-  }
-
   //file upload service
 
   async uploadFile(file) {
@@ -241,7 +157,7 @@ class Service {
 
   //get user details...
 
-  async setUserDetails( user_id, email ) {
+  async setUserDetails( user_id, email , public_key ) {
     // console.log(user_id , email)
     try {
       return await this.databases.createDocument(
@@ -250,6 +166,7 @@ class Service {
         user_id,
         {
           email,
+          public_key
         }
       );
     } catch (error) {
@@ -266,6 +183,19 @@ class Service {
       );
     } catch (error) {
       console.log("error in getPost::", error);
+      return false;
+    }
+  }
+
+  async getUserDetailswithmail(email) {
+    try {
+      return await this.databases.getDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteUserDataId,
+        Query.equal("email",email)
+      );
+    } catch (error) {
+      console.log("error in getDetailswithmail::", error);
       return false;
     }
   }

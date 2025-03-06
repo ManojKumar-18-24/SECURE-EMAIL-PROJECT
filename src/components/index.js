@@ -5,10 +5,9 @@ import Logo from "./Logo";
 import Input from "./Input";
 import PostForm from "./EmailForm";
 import Button from "./Button";
-import NotificationCard from "./NotificationCard";
 import Protected from './AuthLayout'
 import Footer from './Footer'
-import PostCard from './PostCard'
+import EmailCard from './EmailCard'
 import Login from "./Login";
 import Signup from "./Signup";
 
@@ -20,10 +19,9 @@ export {
     Input,
     PostForm,
     Button,
-    NotificationCard,
     Protected,
     Footer,
-    PostCard,
+    EmailCard,
     Login,
     Signup
 };

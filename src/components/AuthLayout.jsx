@@ -1,7 +1,6 @@
 import {useEffect,useState} from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import authService from '../backend/auth'
 
 function AuthLayout({children,authentication = true}) {
 
@@ -10,9 +9,6 @@ function AuthLayout({children,authentication = true}) {
     const authStatus = useSelector( state => state.status)
 
     useEffect(() => {
-        // console.log('in authlayout:' ,authStatus)
-        //const user  = authService.getCurrentUser();
-        // {console.log('in auth::::',user)}
         if(authentication && authStatus !== authentication)
         {
             navigate('/login')
