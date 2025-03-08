@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import store from './store/store.js'
 import {Home , Login , Signup , AddEmail } from './pages'
 import AuthLayout from './components/AuthLayout.jsx'
+import EmailViewer from './pages/EmailViewer.jsx'
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
                 </AuthLayout>
             ),
         },
+        {
+            path:'/emails/:id',
+            element : (
+                <AuthLayout authentication>
+                    <EmailViewer/>
+                </AuthLayout>
+            )
+        }
     ],
 },
 ])

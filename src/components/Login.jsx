@@ -19,13 +19,14 @@ function Login() {
 
             localStorage.setItem("password" , data.password)
             
-            data.password = hashPassword(data.password)
+            data.password = await hashPassword(data.password)
 
+            console.log('login pass:' , data.password)
             const session = await authService.login(data)
             if (session) {
-                const userData = await authService.getCurrentUser()
+                const  userData  = await authService.getCurrentUser()
                 console.log('userdata: ',userData)
-                if(userData) dispatch(authLogin(userData));
+                if(userData) dispatch(authLogin({userData}));
                 navigate("/")
             }
         } catch (error) {

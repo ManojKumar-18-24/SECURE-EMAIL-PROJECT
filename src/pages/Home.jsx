@@ -5,17 +5,41 @@ import { useSelector } from 'react-redux'
 
 function Home() {
 
-    const [posts,setPosts] = useState([])
-    const userData = useSelector(state => state.userData)
+    const [sentposts,setSentPosts] = useState([])
+    const [recvposts,setRecvPosts] = useState([])
+    const { userData } = useSelector(state => state.userData) || {undefined}
     
-    useEffect(() =>{
-        // service.getPosts().then((posts) =>{
-        //     if(posts)
-        //     {
-        //         setPosts(posts.documents)
-        //     }
-        // })
-    },[userData,posts])
+    const getposts = async () => {
+        console.log('userData:', userData);
+        
+        if (userData) { 
+            //const post_id = "67cc463600113e4b0f7a";
+            
+            try {
+                // Fetch single post by ID
+                const sentPosts = await service.getEmailsWithSenderId({userId:userData.$id});
+                
+                setSentPosts(sentPosts.documents);  // Update state
+    
+                console.log('Sent Post:', sentPosts); // Log immediately after fetching
+                
+                // Fetch received posts
+                const receivedPosts = await service.getEmailsWithReceiverId({ userId: userData.$id });
+                setRecvPosts(receivedPosts.documents); // Update state
+    
+                console.log('Received Posts:', receivedPosts.documents);
+                
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            }
+        }
+    };
+    
+    // Call the function inside `useEffect` to avoid re-renders
+    useEffect(() => {
+        getposts();
+    }, [userData]);  // Runs only when `userData` changes
+    
     
     
     if (!userData) {
@@ -37,13 +61,18 @@ function Home() {
     return (
         <div className='w-full py-8'>
             <Container>
-                <div className='flex flex-wrap'>
-                    {posts.map((post) => (
+                 <div className='flex flex-wrap'>
+                    {sentposts.map((post) => (
                         <div key={post.$id} className='p-2 w-1/4'>
                             <EmailCard {...post} id = {post.$id} />
                         </div>
                     ))}
-                </div>
+                    {recvposts.map((post) => (
+                        <div key={post.$id} className='p-2 w-1/4'>
+                            <EmailCard {...post} id = {post.$id} />
+                        </div>
+                    ))}
+                </div> 
             </Container>
         </div>
     )

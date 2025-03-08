@@ -1,19 +1,17 @@
 // Generate AES Key Once
-let aesKey = null;
+import service from "../backend/config";
 
 // Generate a Persistent AES Key
 async function generateAESKey() {
-    if (!aesKey) {
-        aesKey = await crypto.subtle.generateKey(
+    const aesKey = await crypto.subtle.generateKey(
             { name: "AES-CBC", length: 256 },
             true,
             ["encrypt", "decrypt"]
-        );
-    }
+    );
     return aesKey;
 }
 
-// Encrypt File and Return Blob
+// Encrypt File and Return id
 async function encryptFile(file ,key) {
     if (!file) {
         throw new Error("No file provided for encryption!");
@@ -34,12 +32,16 @@ async function encryptFile(file ,key) {
         const metadataLengthBuffer = new Uint16Array([metadataBytes.length]);
 
         // Create final Blob: [IV (16 bytes) + metadata length (2 bytes) + metadata + encrypted data]
-        return new Blob([
+        const encryptedFile =  new Blob([
             iv,
             new Uint8Array(metadataLengthBuffer.buffer),
             metadataBytes,
             new Uint8Array(encryptedData)
         ]);
+
+        const finalFile = new File([encryptedFile], file.name + ".enc", { type: "application/octet-stream" });
+        const response = await service.uploadFile(finalFile);
+        return response.$id
     } catch (error) {
         console.error("Encryption error:", error);
         throw new Error("Encryption failed!");
@@ -97,4 +99,71 @@ function downloadFile(blob, filename) {
 }
 
 
-export { encryptFile, decryptFile ,generateAESKey };
+// Encrypt a text string
+async function encryptText(plainText, key) {
+    const encoder = new TextEncoder();
+    const iv = crypto.getRandomValues(new Uint8Array(16)); // Generate IV
+    const encodedText = encoder.encode(plainText);
+
+    try {
+        const encryptedData = await crypto.subtle.encrypt(
+            { name: "AES-CBC", iv },
+            key,
+            encodedText
+        );
+
+        // Combine IV and encrypted data
+        const combinedData = new Uint8Array(iv.length + encryptedData.byteLength);
+        combinedData.set(iv);
+        combinedData.set(new Uint8Array(encryptedData), iv.length);
+
+        return btoa(String.fromCharCode(...combinedData)); // Encode to Base64 for safe storage
+    } catch (error) {
+        console.error("Encryption error:", error);
+        throw new Error("Encryption failed!");
+    }
+}
+
+// Decrypt a text string
+async function decryptText(encryptedText, key) {
+    const decoder = new TextDecoder();
+    const encryptedBytes = Uint8Array.from(atob(encryptedText), (c) => c.charCodeAt(0));
+
+    // Extract IV and encrypted content
+    const iv = encryptedBytes.slice(0, 16);
+    const encryptedData = encryptedBytes.slice(16);
+
+    try {
+        const decryptedData = await crypto.subtle.decrypt(
+            { name: "AES-CBC", iv },
+            key,
+            encryptedData
+        );
+
+        return decoder.decode(decryptedData); // Convert back to string
+    } catch (error) {
+        console.error("Decryption error:", error);
+        throw new Error("Decryption failed!");
+    }
+}
+
+async function exportKeyToBase64(key) {
+    const exported = await crypto.subtle.exportKey("raw", key);
+    const exportedKeyBuffer = new Uint8Array(exported);
+    return btoa(String.fromCharCode(...exportedKeyBuffer)); // Convert to Base64
+}
+
+async function importKeyFromBase64(base64Key) {
+    const keyBuffer = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
+    return await crypto.subtle.importKey(
+        "raw",
+        keyBuffer,
+        { name: "AES-CBC", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+    );
+}
+
+// Export the functions
+export { encryptFile, decryptFile, generateAESKey, encryptText, decryptText ,exportKeyToBase64 , importKeyFromBase64};
+

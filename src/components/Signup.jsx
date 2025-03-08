@@ -22,21 +22,29 @@ function Signup() {
       const user = await service.getUserDetailswithmail(data.email)
 
       if(user) {
-        throw new Error("user already exists")
+        setError("user already exists")
+        return
       }
 
       localStorage.setItem("password",data.password)
 
       data.password = await hashPassword(data.password)
 
+      console.log('login pass:' , data.password)
+      
       const userData = await authService.createAccount(data);
 
+      console.log(userData)
+      
+      const res = await service.setUserDetails( {user_id : userData.$id ,password :data.password , mail : data.email , public_key : "999999"} )
 
+      console.log('set user details ' , res)
+      
       if (userData) {
-        const userData = await authService.getCurrentUser();
+        const  userData = await authService.getCurrentUser();
 
         if (userData) {
-          dispatch(login(userData));
+          dispatch(login({ userData }));
           navigate("/");
         }
       }

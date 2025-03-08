@@ -28,14 +28,18 @@ function App() {
     <div>Loading</div>
   ) : (
     <div className="bg-gradient-to-r from-gold-500 via-white-500 to-orange-500 min-h-screen flex flex-col">
-      <Header />
-      <div className="flex-grow">
-        <Outlet />
-      </div>
-      <Footer />
-      
+  {/* Header with bottom margin */}
+  <Header className="mb-6" />
 
-    </div>
+  {/* Main Content with vertical padding */}
+  <div className="flex-grow py-6">
+    <Outlet />
+  </div>
+
+  {/* Footer with top margin */}
+  <Footer className="mt-6" />
+</div>
+
   );
 }
 

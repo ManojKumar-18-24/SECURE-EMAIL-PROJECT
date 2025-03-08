@@ -1,37 +1,46 @@
-import { FaRegStar } from "react-icons/fa";
-import { IoDocumentText } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { decryptText, importKeyFromBase64 } from "../cryptography/aes";
 
-function EmailCard({ sender, subject, message, attachment, date }) {
+function EmailCard({id, sender_id, receiver_id, subject,body, fileIds , aes_key }) {
+
+  const [sub,setSub] = useState("")
+  const [ebody,setEbody] = useState("")
+
+  useEffect(() => {
+    const  getinfo = async () => {
+      aes_key = await importKeyFromBase64(aes_key)
+      subject = await decryptText(subject,aes_key)
+      setSub(subject)
+      body = await decryptText(body,aes_key)
+      setEbody(body)
+    }
+      getinfo()
+  },[id])
+
   return (
+    <Link to={`emails/${id}`}>
     <div className="flex items-center p-3 border-b hover:bg-gray-100 cursor-pointer">
       {/* Star Icon */}
-      <FaRegStar className="text-gray-400 mr-3" />
+      {/*<FaRegStar className="text-gray-400 mr-3" />*/}
 
       {/* Email Details */}
       <div className="flex-grow flex items-center">
         {/* Sender Name */}
         <span className="font-medium text-gray-700 w-1/4 truncate">
-          {sender}
+          {sender_id}
         </span>
 
         {/* Subject & Message */}
         <div className="flex-grow text-gray-600 text-sm">
-          <span className="font-semibold">{subject} - </span>
-          <span className="truncate">{message}</span>
+          <span className="font-semibold">{sub} - </span>
+          <span className="truncate">{ebody}</span>
+          <span className="truncate">{`Attachments : ${fileIds.length}`}</span>
         </div>
 
-        {/* Attachment (if exists) */}
-        {attachment && (
-          <div className="ml-4 flex items-center border px-2 py-1 rounded-md bg-gray-200">
-            <IoDocumentText className="text-red-500 mr-1" />
-            <span className="text-xs truncate">{attachment}</span>
-          </div>
-        )}
       </div>
-
-      {/* Date */}
-      <span className="text-gray-500 text-xs ml-3">{date}</span>
     </div>
+    </Link>
   );
 }
 
