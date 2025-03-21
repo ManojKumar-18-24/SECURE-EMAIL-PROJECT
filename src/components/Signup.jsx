@@ -36,13 +36,14 @@ function Signup() {
 
       console.log(userData)
       
-      const res = await service.setUserDetails( {user_id : userData.$id ,password :data.password , mail : data.email , public_key : "999999"} )
+      //const res = await service.setUserDetails( {user_id : userData.$id ,password :data.password , mail : data.email , public_key : "999999"} )
 
-      console.log('set user details ' , res)
+      //
       
       if (userData) {
         const  userData = await authService.getCurrentUser();
-
+        const res = await service.setUserDetails( {user_id : userData.$id ,password :data.password , mail : data.email , public_key : "999999"} )
+        console.log('set user details ' , res)
         if (userData) {
           dispatch(login({ userData }));
           navigate("/");

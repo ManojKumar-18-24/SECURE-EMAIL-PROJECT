@@ -22,7 +22,7 @@ class Service {
     body,
     fileIds,
     isRead,
-    aes_key
+    aes_key,
   }) {
     try {
       return await this.databases.createDocument(
@@ -30,13 +30,13 @@ class Service {
         conf.appwriteEmailId,
         ID.unique(),
         {
-            sender_id,
-            receiver_id,
-            subject,
-            body,
-            fileIds,
-            isRead,
-            aes_key
+          sender_id,
+          receiver_id,
+          subject,
+          body,
+          fileIds,
+          isRead,
+          aes_key,
         }
       );
     } catch (error) {
@@ -44,20 +44,16 @@ class Service {
     }
   }
 
-  async deleteEmail(mail,post_id) {
-    if(mail.sender_id && mail.receiver_id)
-    {
-        const current_User = authService.getCurrentUser()
-        if(current_User == mail.sender_id)
-        {
-            this.updateEmail({sender_id : 'not available',...mail})
-        }
-        else
-        {
-            this.updateEmail({receiver_id : 'not available',...mail})
-        }
-        /*see mail and make one undefined.....*/
-        return
+  async deleteEmail(mail, post_id) {
+    if (mail.sender_id && mail.receiver_id) {
+      const current_User = authService.getCurrentUser();
+      if (current_User == mail.sender_id) {
+        this.updateEmail({ sender_id: "not available", ...mail });
+      } else {
+        this.updateEmail({ receiver_id: "not available", ...mail });
+      }
+      /*see mail and make one undefined.....*/
+      return;
     }
     try {
       await this.databases.deleteDocument(
@@ -72,7 +68,7 @@ class Service {
     }
   }
 
-  async getEmail({post_id}) {
+  async getEmail({ post_id }) {
     try {
       return await this.databases.getDocument(
         conf.appwriteDatabaseId,
@@ -85,15 +81,14 @@ class Service {
     }
   }
 
-  async getEmailsWithSenderId({userId , queries = []}) {
-    console.log('id = ',userId)
-    //queries = [Query.equal("sender_id",String(userId))]
+  async getEmailsWithSenderId({ userId, queries = [] }) {
+    console.log('sender id = ',userId)
+    //queries = [Query.equal("sender_id", String(userId))];
     try {
-
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
         conf.appwriteEmailId,
-        //queries
+        queries
       );
     } catch (error) {
       console.log("error in getMails::", error);
@@ -101,15 +96,14 @@ class Service {
     }
   }
 
-  async getEmailsWithReceiverId({userId , queries = []}) {
-    console.log('id = ',userId)
-    //queries = [Query.equal("receiver_id",String(userId))]
+  async getEmailsWithReceiverId({ userId, queries = [] }) {
+    console.log('receiver id = ',userId)
+    queries = [Query.equal("receiver_id", String(userId))];
     try {
-
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
         conf.appwriteEmailId,
-        //queries
+        queries
       );
     } catch (error) {
       console.log("error in getMails::", error);
@@ -148,28 +142,26 @@ class Service {
 
   async getFileDetails(fileId) {
     try {
-        const file = await this.bucket.getFile(conf.appwriteBucketId, fileId);
-        const fileUrl = `https://cloud.appwrite.io/v1/storage/buckets/${conf.appwriteBucketId}/files/${fileId}/view?project=${conf.appwriteProjectId}&mode=admin`;
+      const file = await this.bucket.getFile(conf.appwriteBucketId, fileId);
+      const fileUrl = `https://cloud.appwrite.io/v1/storage/buckets/${conf.appwriteBucketId}/files/${fileId}/view?project=${conf.appwriteProjectId}&mode=admin`;
 
+      //console.log("file name = : ",file.name)
 
-        //console.log("file name = : ",file.name)
-
-        return {
-            id : fileId ,
-            name: file.name,
-            url: fileUrl, // Returning content for further use
-        };
+      return {
+        id: fileId,
+        name: file.name,
+        url: fileUrl, // Returning content for further use
+      };
     } catch (error) {
-        console.log("Error in getFileDetails::", error);
-        return null;
+      console.log("Error in getFileDetails::", error);
+      return null;
     }
   }
 
-
   //get user details...
 
-  async setUserDetails( {user_id, mail , public_key , password} ) {
-    console.log('in set user ' ,user_id , mail , public_key , password)
+  async setUserDetails({ user_id, mail, public_key, password }) {
+    console.log("in set user ", user_id, mail, public_key, password);
     try {
       return await this.databases.createDocument(
         conf.appwriteDatabaseId,
@@ -178,7 +170,7 @@ class Service {
         {
           password,
           mail,
-          public_key
+          public_key,
         }
       );
     } catch (error) {
@@ -202,24 +194,99 @@ class Service {
   async getUserDetailswithmail({ mail }) {
     console.log("Searching for mail:", mail);
     try {
-        const response = await this.databases.listDocuments(
-            conf.appwriteDatabaseId,
-            conf.appwriteUserDataId,
-            [Query.equal("mail", mail)]  // ✅ Query for the document
-        );
+      const response = await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteUserDataId,
+        [Query.equal("mail", mail)] // ✅ Query for the document
+      );
 
-        if (response.documents.length === 1) {
-            return response.documents[0];  // ✅ Return the only document
-        } else {
-            console.log("User not found or multiple users exist with this email.");
-            return null;
-        }
+      if (response.documents.length === 1) {
+        return response.documents[0]; // ✅ Return the only document
+      } else {
+        console.log("User not found or multiple users exist with this email.");
+        return null;
+      }
     } catch (error) {
-        console.error("Error in getUserDetailsWithMail:", error);
-        return false;
+      console.error("Error in getUserDetailsWithMail:", error);
+      return false;
     }
   }
 
+  // Group functions...
+
+  async getGroups({ userId, queries = [] }) {
+    console.log('in groups: ',userId)
+    queries = [Query.equal("userId", String(userId))];
+    try {
+      return await this.databases.getDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteGroupsId,
+        queries
+      );
+    } catch (error) {
+      console.log("error in getgroups::", error);
+      return false;
+    }
+  }
+
+  async createGroup(groupData) {
+    try {
+      // Iterate over members and create documents for each user
+      const promises = groupData.members.map(async (member) => {
+        // Create document for each user
+        const response = await this.databases.createDocument(
+          conf.appwriteDatabaseId,
+          conf.appwriteGroupsId,
+          ID.unique(),
+          {
+            groupId: groupData.groupId,
+            userId: member.userId,
+            groupName: groupData.groupName,
+            isAdmin: member.isAdmin,
+          }
+        );
+        return response;
+      });
+
+      // Wait for all document creation requests to complete
+      const results = await Promise.all(promises);
+      console.log("Group documents created:", results);
+
+      return { success: true, data: results };
+    } catch (error) {
+      console.error("Error creating group:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async addMember({ userId, groupName, isAdmin }) {
+    try {
+      return await this.databases.createDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteGroupsId,
+        ID.unique(),
+        {
+          userId,
+          groupName,
+          isAdmin,
+        }
+      );
+    } catch (error) {
+      console.log("error in Addmember::", error);
+    }
+  }
+
+  async removeMember({ id }) {
+    try {
+      return await this.databases.deleteDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteGroupsId,
+        id
+      );
+    } catch (error) {
+      console.log("error in deletemember::", error);
+    }
+  }
 }
 
 const service = new Service();
