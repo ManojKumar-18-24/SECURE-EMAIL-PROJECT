@@ -17,6 +17,7 @@ function Groups() {
                 // Fetch group info
                 const groupData = await service.getGroups({ userId: userData.$id });
                 setGroups(groupData.documents);
+                console.log(groupData.documents)
             } catch (error) {
                 console.error('Error fetching groups:', error);
             }
@@ -61,7 +62,7 @@ function Groups() {
                         <div
                             key={group.$id}
                             className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
-                            onClick={() => navigate(`/groups/${group.$id}`)}
+                            onClick={() => navigate(`/groups/${group.groupId}`)}
                         >
                             <h3 className="text-lg font-semibold text-gray-800">{group.groupName}</h3>
                         </div>

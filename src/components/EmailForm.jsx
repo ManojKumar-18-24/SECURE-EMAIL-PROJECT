@@ -50,8 +50,9 @@ function EmailForm({groupId = "abc" , to = true}) {
         data.subject = await encryptText(data.subject , AES_KEY)
         data.body = await encryptText(data.body , AES_KEY)
         data.fileIds = fileIds
-        data.aes_key = await exportKeyToBase64(AES_KEY)
-
+        const expAESKEY = await exportKeyToBase64(AES_KEY)
+        if(groupId ==="abc") data.aes_key = expAESKEY
+        else data.aes_key = 'no_key'
         console.log('key = ',data.aes_key)
         const email = await service.createEmail(data)
         
@@ -59,12 +60,19 @@ function EmailForm({groupId = "abc" , to = true}) {
 
         if(!email) return
 
-        navigate('/') 
+        if(groupId!=='abc'){
+            await service.putAESKEY({grpId:groupId,mailId:email.$id,aes_key:expAESKEY})
+        }
+
+        if(groupId === 'abc')navigate('/') 
+        else navigate(`/groups/${groupId}`) 
     };
 
     return (
+
         <div className="max-w-2xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-4">
             {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+            {console.log('grpid',groupId)}
             <form onSubmit={handleSubmit(submit)}>
                 {/* To Field */}
                 { to && <Input

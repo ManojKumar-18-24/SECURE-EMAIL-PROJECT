@@ -5,7 +5,8 @@ const conf = {
     appwriteEmailId : String(import.meta.env.VITE_APPWRITE_CHAT_TABLE_COLLECTION_ID),
     appwriteUserDataId : String(import.meta.env.VITE_APPWRITE_USER_KEYS_ID),
     appwriteBucketId : String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
-    appwriteGroupsId : String(import.meta.env.VITE_APPWRITE_GROUPS_ID)
+    appwriteGroupsId : String(import.meta.env.VITE_APPWRITE_GROUPS_ID),
+    appwriteGroupsDataId : String(import.meta.env.VITE_APPWRITE_GROUP_DATA_ID)
 }
 
 console.log('conf: ',conf)

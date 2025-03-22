@@ -150,11 +150,26 @@ async function decryptText(encryptedText, key) {
 async function exportKeyToBase64(key) {
     const exported = await crypto.subtle.exportKey("raw", key);
     const exportedKeyBuffer = new Uint8Array(exported);
-    return btoa(String.fromCharCode(...exportedKeyBuffer)); // Convert to Base64
+    
+    // Correct conversion to Base64
+    let binaryString = "";
+    for (let i = 0; i < exportedKeyBuffer.length; i++) {
+        binaryString += String.fromCharCode(exportedKeyBuffer[i]);
+    }
+    
+    return btoa(binaryString); // Properly encode as base64
 }
 
+
 async function importKeyFromBase64(base64Key) {
-    const keyBuffer = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
+    console.log(base64Key)
+    // Proper decoding from Base64
+    const binaryString = atob(base64Key);
+    const keyBuffer = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        keyBuffer[i] = binaryString.charCodeAt(i);
+    }
+    
     return await crypto.subtle.importKey(
         "raw",
         keyBuffer,
@@ -163,6 +178,7 @@ async function importKeyFromBase64(base64Key) {
         ["encrypt", "decrypt"]
     );
 }
+
 
 // Export the functions
 export { encryptFile, decryptFile, generateAESKey, encryptText, decryptText ,exportKeyToBase64 , importKeyFromBase64};

@@ -1,13 +1,21 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { decryptText, importKeyFromBase64 } from "../cryptography/aes";
+import { useSelector } from "react-redux";
+import service from "../backend/config";
 
 function EmailCard({ id, sender_id, receiver_id, subject, body, fileIds, aes_key }) {
   const [sub, setSub] = useState("");
   const [ebody, setEbody] = useState("");
-
+  const {userData} = useSelector(state => state.userData)
   useEffect(() => {
     const getinfo = async () => {
+      if(aes_key === 'no_key'){
+        const response = await service.getAESKEY({mailId:id,userId:userData.$id})
+        console.log(response)
+        console.log('haha')
+        aes_key = response.documents[0].aes_key;
+      }
       aes_key = await importKeyFromBase64(aes_key);
       subject = await decryptText(subject, aes_key);
       setSub(subject);

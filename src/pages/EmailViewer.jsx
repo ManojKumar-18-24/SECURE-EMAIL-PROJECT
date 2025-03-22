@@ -95,6 +95,7 @@ import { useParams } from "react-router-dom";
 import service from "../backend/config"; // Adjust import as needed
 import { decryptText, decryptFile, importKeyFromBase64 } from "../cryptography/aes";
 import { nanoid } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
 
 const EmailViewer = () => {
     const { id } = useParams();
@@ -102,6 +103,7 @@ const EmailViewer = () => {
     const [decryptedEmail, setDecryptedEmail] = useState({ subject: "", body: "" });
     const [files, setFiles] = useState([]);
     const [aes_key, setKey] = useState("");
+    const {userData} = useSelector(state => state.userData)
 
     useEffect(() => {
         const fetchEmail = async () => {
@@ -112,7 +114,14 @@ const EmailViewer = () => {
                     return;
                 }
                 setEmail(emailData);
-
+                
+                if(emailData.aes_key === 'no_key') {
+                    const response = await service.getAESKEY({mailId:id,userId:userData.$id})
+                    console.log(response)
+                    console.log('hehe')
+                    emailData.aes_key = response.documents[0].aes_key;
+                }
+                
                 const key = await importKeyFromBase64(emailData.aes_key);
                 setKey(key);
 

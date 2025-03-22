@@ -306,6 +306,72 @@ class Service {
       console.log("error in deletemember::", error);
     }
   }
+
+  async getAESKEY({mailId,userId ,queries = []}){
+    console.log('userid in getaeskey: ',userId)
+    console.log('mailid in getaeskey: ',mailId)
+    queries = [
+      Query.equal("mailId", mailId),
+      Query.equal("userId", userId)
+    ];
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteGroupsDataId,
+        queries
+      );
+    } catch (error) {
+      console.log("error in getgroups::", error);
+      return false;
+    }
+  }
+
+  async getGroupUsers({grpId , queries = []}){
+    console.log('in groups: ',grpId)
+    queries = [Query.equal("groupId", String(grpId))];
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteGroupsId,
+        queries
+      );
+    } catch (error) {
+      console.log("error in getgroups::", error);
+      return false;
+    }    
+  }
+
+  async putAESKEY({ grpId, mailId, aes_key }) {
+    try {
+      // Fetch group users
+      const users = await this.getGroupUsers({ grpId });
+      const user_docs = users.documents;
+      console.log('user docs',users)
+      // Loop through each user document
+      for (const user of user_docs) {
+        const userId = user.userId; // Extract userId from each document
+  
+        // Add each record to the table
+        await this.databases.createDocument(
+          conf.appwriteDatabaseId, // Replace with your database ID
+          conf.appwriteGroupsDataId, // Replace with your collection ID
+          ID.unique(), // Auto-generate a unique ID
+          {
+            mailId: mailId,      // Insert mailId
+            userId: userId,      // Insert userId from each object
+            aes_key: aes_key,    // Insert aes_key
+          }
+        );
+  
+        //console.log(`Inserted AES key for user ${userId}`);
+      }
+  
+      console.log("All AES keys inserted successfully!");
+    } catch (error) {
+      console.error("Error inserting AES keys:", error);
+    }
+  }
+  
 }
 
 const service = new Service();
