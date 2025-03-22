@@ -5,7 +5,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { RouterProvider } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './store/store.js'
-import {Home , Login , Signup , AddEmail , Groups ,CreateGroup } from './pages'
+import {Home , Login , Signup , AddEmail , Groups ,CreateGroup ,Group } from './pages'
 import AuthLayout from './components/AuthLayout.jsx'
 import EmailViewer from './pages/EmailViewer.jsx'
 
@@ -68,6 +68,22 @@ const router = createBrowserRouter([
             element : (
                 <AuthLayout authentication>
                     <CreateGroup/>
+                </AuthLayout>
+            )
+        },
+        {
+            path:'/groups/:id',
+            element : (
+                <AuthLayout authentication>
+                    <Group/>
+                </AuthLayout>
+            )
+        },
+        {
+            path:'/groups/:grpid/emails/:id',
+            element : (
+                <AuthLayout authentication>
+                    <EmailViewer/>
                 </AuthLayout>
             )
         }

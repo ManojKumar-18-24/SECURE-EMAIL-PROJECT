@@ -1,7 +1,7 @@
 import conf from "../conf/conf";
 import { Client, ID, Databases, Storage, Query } from "appwrite";
 import authService from "./auth";
-
+import { nanoid } from "@reduxjs/toolkit";
 class Service {
   client = new Client();
   databases;
@@ -18,6 +18,7 @@ class Service {
   async createEmail({
     sender_id,
     receiver_id,
+    groupId = " ",
     subject,
     body,
     fileIds,
@@ -25,6 +26,7 @@ class Service {
     aes_key,
   }) {
     try {
+
       return await this.databases.createDocument(
         conf.appwriteDatabaseId,
         conf.appwriteEmailId,
@@ -37,6 +39,7 @@ class Service {
           fileIds,
           isRead,
           aes_key,
+          groupId
         }
       );
     } catch (error) {
@@ -83,7 +86,7 @@ class Service {
 
   async getEmailsWithSenderId({ userId, queries = [] }) {
     console.log('sender id = ',userId)
-    //queries = [Query.equal("sender_id", String(userId))];
+    queries = [Query.equal("sender_id", String(userId))];
     try {
       return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
@@ -218,7 +221,7 @@ class Service {
     console.log('in groups: ',userId)
     queries = [Query.equal("userId", String(userId))];
     try {
-      return await this.databases.getDocument(
+      return await this.databases.listDocuments(
         conf.appwriteDatabaseId,
         conf.appwriteGroupsId,
         queries
@@ -231,6 +234,7 @@ class Service {
 
   async createGroup(groupData) {
     try {
+      //const grpId = nanoid();
       // Iterate over members and create documents for each user
       const promises = groupData.members.map(async (member) => {
         // Create document for each user
@@ -242,7 +246,7 @@ class Service {
             groupId: groupData.groupId,
             userId: member.userId,
             groupName: groupData.groupName,
-            isAdmin: member.isAdmin,
+            //isAdmin: member.isAdmin,
           }
         );
         return response;
@@ -259,6 +263,21 @@ class Service {
     }
   }
 
+  async getEmailsWithGroupId({ groupId, queries = [] }) {
+    console.log('receiver id = ',groupId)
+    queries = [Query.equal("groupId", String(groupId))];
+    try {
+      return await this.databases.listDocuments(
+        conf.appwriteDatabaseId,
+        conf.appwriteEmailId,
+        queries
+      );
+    } catch (error) {
+      console.log("error in getMails::", error);
+      return false;
+    }
+  }
+  
   async addMember({ userId, groupName, isAdmin }) {
     try {
       return await this.databases.createDocument(

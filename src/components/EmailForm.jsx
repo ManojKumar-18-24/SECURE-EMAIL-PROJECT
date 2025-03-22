@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import service from '../backend/config';
 import { generateAESKey , encryptFile , encryptText , exportKeyToBase64} from '../cryptography/aes';
 
-function EmailForm() {
+function EmailForm({groupId = "abc" , to = true}) {
     const { register, handleSubmit } = useForm();
     const navigate = useNavigate();
     const { userData } = useSelector(state => state.userData);
@@ -23,19 +23,23 @@ function EmailForm() {
     };
 
     const submit = async (data) => {
-         console.log("Form Data:", data.to);
+        console.log("Form Data:", data.to);
         // console.log("Selected Files:", selectedFiles);
         // navigate('/success');
-        const receiver = await service.getUserDetailswithmail({mail :data.to })
-        if(!receiver){
+        let receiver
+        if(data.to){
+            receiver = await service.getUserDetailswithmail({mail :data.to })
+            data.receiver_id = receiver.$id;
+        } 
+
+        if(data.to && !receiver){
             setError("no user found")
             return 
         }
-        data.receiver_id = receiver.$id 
         data.sender_id = userData.$id
         const AES_KEY = await generateAESKey() 
         console.log('aes key: ',AES_KEY)
-
+        data.groupId = groupId
         let fileIds = []
         
         for (let i = 0; i < selectedFiles.length; i++) {
@@ -63,13 +67,13 @@ function EmailForm() {
             {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
             <form onSubmit={handleSubmit(submit)}>
                 {/* To Field */}
-                <Input
+                { to && <Input
                     label="To"
                     placeholder="Recipient email"
                     className="w-full text-lg border-none focus:ring-0"
                     {...register("to", { required: true })}
                 />
-                
+                }
                 {/* Subject Field */}
                 <Input
                     label="Subject"

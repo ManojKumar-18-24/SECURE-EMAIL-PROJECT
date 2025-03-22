@@ -65,7 +65,7 @@ function CreateGroup() {
         try {
             const response = await service.createGroup(groupData);
             if (response.success) {
-                navigate(`/groups/${groupId}`);
+                navigate(`/groups`);
             } else {
                 setError('Error creating group');
             }
