@@ -6,7 +6,9 @@ const conf = {
     appwriteUserDataId : String(import.meta.env.VITE_APPWRITE_USER_KEYS_ID),
     appwriteBucketId : String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
     appwriteGroupsId : String(import.meta.env.VITE_APPWRITE_GROUPS_ID),
-    appwriteGroupsDataId : String(import.meta.env.VITE_APPWRITE_GROUP_DATA_ID)
+    appwriteGroupsDataId : String(import.meta.env.VITE_APPWRITE_GROUP_DATA_ID),
+    publicKey: String(import.meta.env.VITE_PUBLIC_KEY),
+    privateKey: String(import.meta.env.VITE_PRIVATE_KEY)
 }
 
 console.log('conf: ',conf)

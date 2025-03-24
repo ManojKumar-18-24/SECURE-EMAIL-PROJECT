@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import authService from "./backend/auth";
 import {login,logout} from './store/authSlice'
 import './index.css'; 
+import RSA from "./cryptography/rsa";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,6 @@ function App() {
     <div className="bg-gradient-to-r from-gold-500 via-white-500 to-orange-500 min-h-screen flex flex-col">
   {/* Header with bottom margin */}
   <Header className="mb-6" />
-
   {/* Main Content with vertical padding */}
   <div className="flex-grow py-6">
     <Outlet />

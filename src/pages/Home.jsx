@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react'
 import service from '../backend/config'
 import { Container,EmailCard} from '../components'
 import { useSelector } from 'react-redux'
-
+import RSA from '../cryptography/rsa'
 function Home() {
 
     const [sentposts,setSentPosts] = useState([])
@@ -11,7 +11,9 @@ function Home() {
     
     const getposts = async () => {
         console.log('userData:', userData);
-        
+        const {encryptedMessage , decryptedMessage} = await RSA("nippura u ppura ")
+        console.log('enc',encryptedMessage)
+        console.log('dec',decryptedMessage)
         if (userData) { 
             //const post_id = "67cc463600113e4b0f7a";
             
