@@ -11,7 +11,7 @@ function Group() {
   const { id } = useParams();
 
   const getposts = async () => {
-    console.log("userData:", userData);
+    //console.log("userData:", userData);
 
     if (userData) {
       //const post_id = "67cc463600113e4b0f7a";
@@ -22,7 +22,7 @@ function Group() {
 
         setGroupPosts(groupPosts.documents); // Update state
 
-        console.log("Sent Post:", groupPosts); // Log immediately after fetching
+        //console.log("Sent Post:", groupPosts); // Log immediately after fetching
 
         // Fetch received posts
         // const receivedPosts = await service.getEmailsWithReceiverId({ userId: userData.$id });

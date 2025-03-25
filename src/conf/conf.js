@@ -11,7 +11,7 @@ const conf = {
     privateKey: String(import.meta.env.VITE_PRIVATE_KEY)
 }
 
-console.log('conf: ',conf)
+//console.log('conf: ',conf)
 
 //console.log('conf = ',conf);
 export default conf

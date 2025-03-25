@@ -162,7 +162,7 @@ async function exportKeyToBase64(key) {
 
 
 async function importKeyFromBase64(base64Key) {
-    console.log(base64Key)
+    //console.log(base64Key)
     // Proper decoding from Base64
     const binaryString = atob(base64Key);
     const keyBuffer = new Uint8Array(binaryString.length);

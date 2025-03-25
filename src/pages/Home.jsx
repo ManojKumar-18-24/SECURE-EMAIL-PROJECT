@@ -2,7 +2,7 @@ import {useState,useEffect} from 'react'
 import service from '../backend/config'
 import { Container,EmailCard} from '../components'
 import { useSelector } from 'react-redux'
-import RSA from '../cryptography/rsa'
+//import RSA from '../cryptography/rsa'
 function Home() {
 
     const [sentposts,setSentPosts] = useState([])
@@ -10,10 +10,10 @@ function Home() {
     const { userData } = useSelector(state => state.userData) || {undefined}
     
     const getposts = async () => {
-        console.log('userData:', userData);
-        const {encryptedMessage , decryptedMessage} = await RSA("nippura u ppura ")
-        console.log('enc',encryptedMessage)
-        console.log('dec',decryptedMessage)
+        //console.log('userData:', userData);
+        //const {encryptedMessage , decryptedMessage} = await RSA("nippura u ppura ")
+        //console.log('enc',encryptedMessage)
+        //console.log('dec',decryptedMessage)
         if (userData) { 
             //const post_id = "67cc463600113e4b0f7a";
             
@@ -23,13 +23,13 @@ function Home() {
                 
                 setSentPosts(sentPosts.documents);  // Update state
     
-                console.log('Sent Post:', sentPosts); // Log immediately after fetching
+                //console.log('Sent Post:', sentPosts); // Log immediately after fetching
                 
                 // Fetch received posts
                 const receivedPosts = await service.getEmailsWithReceiverId({ userId: userData.$id });
                 setRecvPosts(receivedPosts.documents); // Update state
     
-                console.log('Received Posts:', receivedPosts.documents);
+                //console.log('Received Posts:', receivedPosts.documents);
                 
             } catch (error) {
                 console.error("Error fetching posts:", error);

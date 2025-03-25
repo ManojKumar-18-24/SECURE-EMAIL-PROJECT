@@ -8,6 +8,8 @@ async function hashPassword(password) {
 
 // Function to generate SHA-512 hash
 async function generateHash({userId, subject, body}) {
+
+    //console.log('in hash function',userId,subject,body)
     // Concatenate input strings
     const inputData = userId + subject + body;
 

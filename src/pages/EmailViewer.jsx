@@ -9,6 +9,7 @@ import {
 import { nanoid } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 import { DecryptAesKey } from "../cryptography/rsa";
+import { generateHash } from "../cryptography/hash";
 
 const EmailViewer = () => {
   const { id } = useParams();
@@ -20,7 +21,7 @@ const EmailViewer = () => {
   const [files, setFiles] = useState([]);
   const [aes_key, setKey] = useState("");
   const { userData } = useSelector((state) => state.userData);
-
+  const [verified,setVerified] = useState(false)
   useEffect(() => {
     const fetchEmail = async () => {
       try {
@@ -36,13 +37,13 @@ const EmailViewer = () => {
             mailId: id,
             userId: userData.$id,
           });
-          console.log(response);
-          console.log("hehe");
+          //console.log(response);
+          //console.log("hehe");
           emailData.aes_key = response.documents[0].aes_key;
         }
 
         emailData.aes_key = await DecryptAesKey(emailData.aes_key);
-
+        const hash = await DecryptAesKey(emailData.hash)
         const key = await importKeyFromBase64(emailData.aes_key);
         setKey(key);
 
@@ -58,6 +59,8 @@ const EmailViewer = () => {
           }
           setFiles(files);
         }
+
+        setVerified(hash === await generateHash({userId:emailData.sender_id,subject:decryptedSubject,body:decryptedBody}))
       } catch (error) {
         console.error("Error fetching email:", error);
       }
@@ -76,7 +79,7 @@ const EmailViewer = () => {
         📩 Email Details
       </h1>
 
-      {email ? (
+      {email && verified ? (
         <>
           {/* Subject Section */}
           <div className="p-4 bg-gray-100 rounded-lg shadow-sm mb-3">
@@ -122,6 +125,9 @@ const EmailViewer = () => {
       ) : (
         <p className="text-gray-500 text-center">Loading email...</p>
       )}
+      {
+        !verified && <div> Hash false came</div>
+      }
     </div>
   );
 };

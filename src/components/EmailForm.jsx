@@ -11,6 +11,7 @@ import {
   exportKeyToBase64,
 } from "../cryptography/aes";
 import { EncryptAesKey } from "../cryptography/rsa";
+import { generateHash } from "../cryptography/hash";
 
 function EmailForm({ groupId = "abc", to = true }) {
   const { register, handleSubmit } = useForm();
@@ -29,7 +30,7 @@ function EmailForm({ groupId = "abc", to = true }) {
   };
 
   const submit = async (data) => {
-    console.log("Form Data:", data.to);
+    //console.log("Form Data:", data.to);
     // console.log("Selected Files:", selectedFiles);
     // navigate('/success');
     let receiver;
@@ -44,7 +45,7 @@ function EmailForm({ groupId = "abc", to = true }) {
     }
     data.sender_id = userData.$id;
     const AES_KEY = await generateAESKey();
-    console.log("aes key: ", AES_KEY);
+    //console.log("aes key: ", AES_KEY);
     data.groupId = groupId;
     let fileIds = [];
 
@@ -53,6 +54,10 @@ function EmailForm({ groupId = "abc", to = true }) {
       fileIds.push(fileid);
     }
 
+    data.hash = await generateHash({userId:userData.$id,subject:data.subject,body:data.body})
+    //console.log('hash bef enc sender:' , data.hash)
+    data.hash = await EncryptAesKey(data.hash)
+    //console.log('hash aft enc sender:' , data.hash)
     data.subject = await encryptText(data.subject, AES_KEY);
     data.body = await encryptText(data.body, AES_KEY);
     data.fileIds = fileIds;
@@ -60,10 +65,10 @@ function EmailForm({ groupId = "abc", to = true }) {
     expAESKEY = await EncryptAesKey(expAESKEY)
     if (groupId === "abc") data.aes_key = expAESKEY;
     else data.aes_key = "no_key";
-    console.log("key = ", data.aes_key);
+    //console.log("key = ", data.aes_key);
     const email = await service.createEmail(data);
 
-    console.log(email);
+    ///console.log(email);
 
     if (!email) return;
 
@@ -82,7 +87,6 @@ function EmailForm({ groupId = "abc", to = true }) {
   return (
     <div className="max-w-2xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-4">
       {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-      {console.log("grpid", groupId)}
       <form onSubmit={handleSubmit(submit)}>
         {/* To Field */}
         {to && (

@@ -24,6 +24,7 @@ class Service {
     fileIds,
     isRead,
     aes_key,
+    hash
   }) {
     try {
 
@@ -39,7 +40,8 @@ class Service {
           fileIds,
           isRead,
           aes_key,
-          groupId
+          groupId,
+          hash
         }
       );
     } catch (error) {
@@ -85,7 +87,7 @@ class Service {
   }
 
   async getEmailsWithSenderId({ userId, queries = [] }) {
-    console.log('sender id = ',userId)
+    //console.log('sender id = ',userId)
     queries = [Query.equal("sender_id", String(userId))];
     try {
       return await this.databases.listDocuments(
@@ -100,7 +102,7 @@ class Service {
   }
 
   async getEmailsWithReceiverId({ userId, queries = [] }) {
-    console.log('receiver id = ',userId)
+    //console.log('receiver id = ',userId)
     queries = [Query.equal("receiver_id", String(userId))];
     try {
       return await this.databases.listDocuments(
@@ -164,7 +166,7 @@ class Service {
   //get user details...
 
   async setUserDetails({ user_id, mail, public_key, password }) {
-    console.log("in set user ", user_id, mail, public_key, password);
+    //console.log("in set user ", user_id, mail, public_key, password);
     try {
       return await this.databases.createDocument(
         conf.appwriteDatabaseId,
@@ -195,7 +197,7 @@ class Service {
   }
 
   async getUserDetailswithmail({ mail }) {
-    console.log("Searching for mail:", mail);
+    //console.log("Searching for mail:", mail);
     try {
       const response = await this.databases.listDocuments(
         conf.appwriteDatabaseId,
@@ -218,7 +220,7 @@ class Service {
   // Group functions...
 
   async getGroups({ userId, queries = [] }) {
-    console.log('in groups: ',userId)
+    //console.log('in groups: ',userId)
     queries = [Query.equal("userId", String(userId))];
     try {
       return await this.databases.listDocuments(
@@ -264,7 +266,7 @@ class Service {
   }
 
   async getEmailsWithGroupId({ groupId, queries = [] }) {
-    console.log('receiver id = ',groupId)
+    //console.log('receiver id = ',groupId)
     queries = [Query.equal("groupId", String(groupId))];
     try {
       return await this.databases.listDocuments(
@@ -308,8 +310,8 @@ class Service {
   }
 
   async getAESKEY({mailId,userId ,queries = []}){
-    console.log('userid in getaeskey: ',userId)
-    console.log('mailid in getaeskey: ',mailId)
+    //console.log('userid in getaeskey: ',userId)
+    //console.log('mailid in getaeskey: ',mailId)
     queries = [
       Query.equal("mailId", mailId),
       Query.equal("userId", userId)
@@ -327,7 +329,7 @@ class Service {
   }
 
   async getGroupUsers({grpId , queries = []}){
-    console.log('in groups: ',grpId)
+    //console.log('in groups: ',grpId)
     queries = [Query.equal("groupId", String(grpId))];
     try {
       return await this.databases.listDocuments(
@@ -346,7 +348,7 @@ class Service {
       // Fetch group users
       const users = await this.getGroupUsers({ grpId });
       const user_docs = users.documents;
-      console.log('user docs',users)
+      //console.log('user docs',users)
       // Loop through each user document
       for (const user of user_docs) {
         const userId = user.userId; // Extract userId from each document
