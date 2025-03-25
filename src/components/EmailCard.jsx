@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { decryptText, importKeyFromBase64 } from "../cryptography/aes";
 import { useSelector } from "react-redux";
 import service from "../backend/config";
-
+import { DecryptAesKey } from "../cryptography/rsa";
 function EmailCard({ id, sender_id, receiver_id, subject, body, fileIds, aes_key }) {
   const [sub, setSub] = useState("");
   const [ebody, setEbody] = useState("");
@@ -16,6 +16,8 @@ function EmailCard({ id, sender_id, receiver_id, subject, body, fileIds, aes_key
         console.log('haha')
         aes_key = response.documents[0].aes_key;
       }
+
+      aes_key = await DecryptAesKey(aes_key);
       aes_key = await importKeyFromBase64(aes_key);
       subject = await decryptText(subject, aes_key);
       setSub(subject);

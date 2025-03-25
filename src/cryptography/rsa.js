@@ -2,30 +2,30 @@ import conf from '/src/conf/conf.js';
 
 const { privateKey, publicKey } = conf;
 
-async function generateRSAKeys() {
-    const rsaKeyPair = await crypto.subtle.generateKey(
-        {
-            name: "RSA-OAEP",
-            modulusLength: 2048,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: "SHA-256",
-        },
-        true,
-        ["encrypt", "decrypt"]
-    );
+// async function generateRSAKeys() {
+//     const rsaKeyPair = await crypto.subtle.generateKey(
+//         {
+//             name: "RSA-OAEP",
+//             modulusLength: 2048,
+//             publicExponent: new Uint8Array([1, 0, 1]),
+//             hash: "SHA-256",
+//         },
+//         true,
+//         ["encrypt", "decrypt"]
+//     );
 
-    return rsaKeyPair;
-}
+//     return rsaKeyPair;
+// }
 
 
-async function exportRSAKeyToBase64(key, isPublic = true) {
-    const exported = await crypto.subtle.exportKey(
-        isPublic ? "spki" : "pkcs8",
-        key
-    );
-    const exportedKeyBuffer = new Uint8Array(exported);
-    return btoa(String.fromCharCode(...exportedKeyBuffer));
-}
+// async function exportRSAKeyToBase64(key, isPublic = true) {
+//     const exported = await crypto.subtle.exportKey(
+//         isPublic ? "spki" : "pkcs8",
+//         key
+//     );
+//     const exportedKeyBuffer = new Uint8Array(exported);
+//     return btoa(String.fromCharCode(...exportedKeyBuffer));
+// }
 
 
 async function importRSAKeyFromBase64(base64Key, isPublic = true) {
@@ -77,6 +77,20 @@ async function decryptWithRSA(privateKey, encryptedBase64) {
     return decoder.decode(decryptedData);
 }
 
+const EncryptAesKey = async (message) => {
+    const publicKeyBase64 = publicKey
+    const importedPublicKey = await importRSAKeyFromBase64(publicKeyBase64, true);
+    const encryptedMessage = await encryptWithRSA(importedPublicKey, message);
+    return encryptedMessage
+}
+
+const DecryptAesKey = async(encryptedMessage) => {
+    const privateKeyBase64 = privateKey
+    const importedPrivateKey = await importRSAKeyFromBase64(privateKeyBase64, false);
+    const decryptedMessage = await decryptWithRSA(importedPrivateKey, encryptedMessage);
+    return decryptedMessage
+}
+
 const RSA = async (message)  => {
     // Generate RSA keys
     //const rsaKeys = await generateRSAKeys();
@@ -104,4 +118,8 @@ const RSA = async (message)  => {
     return {encryptedMessage , decryptedMessage}
 };
 
-export default RSA
+export {
+    EncryptAesKey,
+    DecryptAesKey,
+    RSA
+}
