@@ -17,7 +17,7 @@ function Groups() {
                 // Fetch group info
                 const groupData = await service.getGroups({ userId: userData.$id });
                 setGroups(groupData.documents);
-                console.log(groupData.documents)
+                //console.log(groupData.documents)
             } catch (error) {
                 console.error('Error fetching groups:', error);
             }
